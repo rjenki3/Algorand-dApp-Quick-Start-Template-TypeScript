@@ -46,7 +46,7 @@ const Home: React.FC<HomeProps> = () => {
       {/* ---------------- Hero Section ---------------- */}
       <header className="text-center py-10 px-4">
         <h2 className="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-500 mb-4">
-          Explore Algorand on TestNet
+          Explore Algorand on TestNet!
         </h2>
         <p className="text-gray-400 max-w-2xl mx-auto">
           This project demonstrates the core building blocks of an Algorand dApp.
