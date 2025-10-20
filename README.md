@@ -113,7 +113,7 @@ https://github.com/user-attachments/assets/dd452ea1-3070-4718-af34-bea978e208ab
 - `projects/QuickStartTemplate-frontend/src/` — Frontend Webpage files
 - `projects/QuickStartTemplate-frontend/src/Home.tsx` - Homepage (you can design this page)
 - `projects/QuickStartTemplate-frontend/src/App.tsx` — Main app layout and routing  
-- `projects/QuickStartTemplate-frontend/src/components/Transact.tsx` — Simple transfer ALGO and USDC logic 
+- `projects/QuickStartTemplate-frontend/src/components/Transact.tsx` — Simple transfer ALGO & USDC, Opt-In and Atomic Transfer Logic
 - `projects/QuickStartTemplate-frontend/src/components/NFTmint.tsx` — Simple NFT minting interface  
 - `projects/QuickStartTemplate-frontend/src/components/Tokenmint.tsx` — Simple token (ASA) minting interface  
 - `projects/QuickStartTemplate-frontend/src/components/AppCalls.tsx` — Smart contract interaction demo
@@ -123,10 +123,26 @@ https://github.com/user-attachments/assets/dd452ea1-3070-4718-af34-bea978e208ab
 - `projects/QuickStartTemplate-contracts/nft_mint_server/` — Backend server for NFT minting (contains `.env.template` and where you create your own `.env`)  
 
 
-## Reference Guide
+## Bonus Resources & Reference Guide
 
 Need more help? See the Algorand-dApp-Quick-Start-Template Reference Guide for step-by-step instructions, AI prompts, and troubleshooting tips:
 
 [View the guide](https://docs.google.com/document/d/1f_ysbtFOLKM_Tjvey7VCcGYsAzOmyEVmsdC5si936wc/edit?usp=sharing)
 
+Below are videos on:
+- How to connect to Testnet on Pera
+- How to use the Algo Dispenser
+- How to use the USDC Dispenser
+
+**How to connext to testnet on Pera Wallet**
+
+https://github.com/user-attachments/assets/31df8135-119e-4529-9539-4943de979719
+
+**How to use the Algo Dispenser**
+
+https://github.com/user-attachments/assets/643cae10-4673-4b68-8e95-4a3f16fbba60
+
+**How to use the USDC Dispenser**
+
+https://github.com/user-attachments/assets/a76e90fa-97f4-44f8-a7e8-a8ccabd24398
 
