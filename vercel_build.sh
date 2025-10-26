@@ -44,6 +44,12 @@ echo "==> Link/bootstrap (non-interactive; safe to no-op)"
 )
 ALGOKIT_NO_INTERACTIVE=1 ALGOKIT_NO_SPINNER=1 algokit project bootstrap all || true
 
+echo "==> VITE_API_URL (from Vercel env): ${VITE_API_URL:-<empty>}"
+if [ -n "${VITE_API_URL:-}" ]; then
+  printf "VITE_API_URL=%s\n" "$VITE_API_URL" > "$FRONTEND_DIR/.env.production"
+  echo "==> Wrote $FRONTEND_DIR/.env.production"
+fi
+
 echo "==> Build frontend"
 npm --prefix "$FRONTEND_DIR" run build
 
