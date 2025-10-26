@@ -21,11 +21,23 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS || '*')
 
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) return cb(null, true)
+    if (!origin) return cb(null, true) // same-origin or curl
+    if (allowedOrigins.includes('*')) return cb(null, true)
+    if (allowedOrigins.includes(origin)) return cb(null, true)
+
+    // ✅ Extra: allow any frontend on vercel.app (great for student forks)
+    try {
+      const host = new URL(origin).hostname
+      if (host.endsWith('.vercel.app')) return cb(null, true)
+    } catch (_) {}
+
     return cb(null, false)
-  }
+  },
+  credentials: false,
 }))
+
 app.use(express.json())
+
 
 // Pinata client
 const pinata = process.env.PINATA_JWT
