@@ -9,7 +9,6 @@ python3 -m pip install --user pipx
 python3 -m pipx ensurepath || true
 
 echo "==> Install/upgrade AlgoKit via pipx"
-# If already present, upgrade; otherwise install
 if command -v algokit >/dev/null 2>&1; then
   pipx upgrade algokit || true
 else
@@ -19,19 +18,24 @@ fi
 echo "==> Python libs used by the project (user scope)"
 python3 -m pip install --user -U py-algorand-sdk python-dotenv algokit-utils || true
 
-FRONTEND_DIR="QuickStartTemplate/projects/QuickStartTemplate-frontend"
-CONTRACTS_DIR="QuickStartTemplate/projects/QuickStartTemplate-contracts"
+# -----------------------------------
+# Resolve frontend directory
+# -----------------------------------
+# If we're already inside the frontend folder, use '.'
+# Otherwise fallback to the monorepo path
+if [ -f "./package.json" ] && grep -q '"name": "QuickStartTemplate-frontend"' ./package.json 2>/dev/null; then
+  FRONTEND_DIR="."
+else
+  FRONTEND_DIR="QuickStartTemplate/projects/QuickStartTemplate-frontend"
+fi
+
+echo "==> FRONTEND_DIR resolved to: $FRONTEND_DIR"
 
 echo "==> Install frontend deps"
 ( npm --prefix "$FRONTEND_DIR" ci || npm --prefix "$FRONTEND_DIR" install )
 
 echo "==> Ensure client generator is present (dev dep)"
 npm --prefix "$FRONTEND_DIR" install --save-dev @algorandfoundation/algokit-client-generator@latest || true
-
-echo "==> (Optional) install contracts deps if present"
-if [ -f "$CONTRACTS_DIR/package.json" ]; then
-  ( npm --prefix "$CONTRACTS_DIR" ci || npm --prefix "$CONTRACTS_DIR" install )
-fi
 
 echo "==> Link/bootstrap (non-interactive; safe to no-op)"
 (
