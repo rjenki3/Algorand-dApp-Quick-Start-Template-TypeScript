@@ -1,6 +1,6 @@
 // NFTmint.tsx
 // Upload an image → send it to backend (Pinata/IPFS) → mint Algorand NFT (ASA)
-// Designed to work automatically in GitHub Codespaces (just set port 3001 Public).
+// Works in Vercel (via VITE_API_URL) and GitHub Codespaces (auto-detects -3001 host).
 
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { useWallet } from '@txnlab/use-wallet-react'
@@ -15,17 +15,33 @@ interface NFTMintProps {
   setModalState: (value: boolean) => void
 }
 
-const NFTmint = ({ openModal, setModalState }: NFTMintProps) => {
-  const LORA = 'https://lora.algokit.io/testnet';
+function resolveBackendBase(): string {
+  // 1) Respect explicit env (Vercel or custom)
+  const env = import.meta.env.VITE_API_URL?.trim()
+  if (env) return env.replace(/\/$/, '')
 
-  // UI state: file, preview image, and loading spinner
+  // 2) Codespaces: convert current host to port 3001
+  // e.g. https://abc-5173.app.github.dev -> https://abc-3001.app.github.dev
+  const host = window.location.host
+  if (host.endsWith('.app.github.dev')) {
+    const base = host.replace(/-\d+\.app\.github\.dev$/, '-3001.app.github.dev')
+    return `https://${base}`
+  }
+
+  // 3) Plain local fallback
+  return 'http://localhost:3001'
+}
+
+const NFTmint = ({ openModal, setModalState }: NFTMintProps) => {
+  const LORA = 'https://lora.algokit.io/testnet'
+
+  // UI state
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string>('')
+  const [previewUrl, setPreviewUrl] = useState<string>('') 
   const [loading, setLoading] = useState<boolean>(false)
-  
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Wallet + notification hooks
+  // Wallet + notifications
   const { transactionSigner, activeAddress } = useWallet()
   const { enqueueSnackbar } = useSnackbar()
 
@@ -33,18 +49,17 @@ const NFTmint = ({ openModal, setModalState }: NFTMintProps) => {
   const algodConfig = getAlgodConfigFromViteEnvironment()
   const algorand = AlgorandClient.fromConfig({ algodConfig })
 
-  // Handle file pick + preview URL
+  // Handle file pick + preview
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null
     setSelectedFile(file)
-    if (file) setPreviewUrl(URL.createObjectURL(file))
-    else setPreviewUrl('')
+    setPreviewUrl(file ? URL.createObjectURL(file) : '')
   }
 
   // Click on dropzone → open hidden file input
   const handleDivClick = () => fileInputRef.current?.click()
 
-  // Main flow: upload file → pin metadata → mint NFT
+  // Main: upload → pin metadata → mint NFT
   const handleMintNFT = async () => {
     setLoading(true)
 
@@ -64,29 +79,14 @@ const NFTmint = ({ openModal, setModalState }: NFTMintProps) => {
 
     enqueueSnackbar('Uploading and preparing NFT...', { variant: 'info' })
     let metadataUrl = ''
-    
+
     try {
-      // ---------------------------------
-      // Detect backend URL automatically
-      // Works on any Codespace fork
-      // Remember: set port 3001 → Public
-      // ---------------------------------
-      const currentUrl = window.location.href
-      let backendApiUrl = ''
+      // Build backend URL
+      const backendBase = resolveBackendBase()
+      const backendApiUrl = `${backendBase.replace(/\/$/, '')}/api/pin-image`
+      console.log('Using backend URL:', backendApiUrl)
 
-      const match = currentUrl.match(/https:\/\/([^.]+)-\d+\.app\.github\.dev/)
-      if (match) {
-        const baseCodespace = match[1]
-        backendApiUrl = `https://${baseCodespace}-3001.app.github.dev/api/pin-image`
-      } else {
-        // Fallback if not on Codespaces
-        backendApiUrl = 'http://localhost:3001/api/pin-image'
-      }
-      console.log('Backend URL:', backendApiUrl)
-
-      // ------------------------------
       // Send file → backend → Pinata/IPFS
-      // ------------------------------
       const formData = new FormData()
       formData.append('file', selectedFile)
 
@@ -105,35 +105,31 @@ const NFTmint = ({ openModal, setModalState }: NFTMintProps) => {
       metadataUrl = data.metadataUrl
       if (!metadataUrl) throw new Error('Backend did not return a valid metadata URL')
     } catch (e: any) {
-      enqueueSnackbar('Error uploading to backend. Is port 3001 Public?', { variant: 'error' })
+      enqueueSnackbar('Error uploading to backend. If in Codespaces, make port 3001 Public.', { variant: 'error' })
       setLoading(false)
       return
     }
 
     try {
-      // ------------------------------
       // Mint ASA (NFT) on Algorand
-      // ------------------------------
       enqueueSnackbar('Minting NFT on Algorand...', { variant: 'info' })
 
-      // Hash the metadata URL (demo shortcut).
-      // ARC-3 standard would hash the JSON bytes instead.
+      // Hash the metadata URL (demo shortcut). ARC-3 would hash JSON bytes instead.
       const metadataHash = new Uint8Array(Buffer.from(sha512_256.digest(metadataUrl)))
 
-      // 👇 Customize for your project
       const createNFTResult = await algorand.send.assetCreate({
         sender: activeAddress,
         signer: transactionSigner,
-        total: 1n,                     // supply = 1 → NFT
-        decimals: 0,                   // indivisible
-        assetName: 'MasterPass Ticket',// <— change name
-        unitName: 'MTK',               // <— change ticker
-        url: metadataUrl,              // IPFS metadata
+        total: 1n,                    // supply = 1 → NFT
+        decimals: 0,                  // indivisible
+        assetName: 'MasterPass Ticket', // customize
+        unitName: 'MTK',                // customize
+        url: metadataUrl,               // IPFS metadata
         metadataHash,
         defaultFrozen: false,
       })
 
-      const id = createNFTResult;
+      const id = createNFTResult
 
       enqueueSnackbar(`✅ Success! Asset ID: ${id.assetId}`, {
         variant: 'success',
@@ -148,8 +144,8 @@ const NFTmint = ({ openModal, setModalState }: NFTMintProps) => {
               View on Lora ↗
             </a>
           ) : null,
-      });
-      
+      })
+
       // Reset form + close modal
       setSelectedFile(null)
       setPreviewUrl('')
@@ -161,9 +157,7 @@ const NFTmint = ({ openModal, setModalState }: NFTMintProps) => {
     }
   }
 
-  // ------------------------------
-  // Modal UI
-  // ------------------------------
+  // UI
   return (
     <dialog id="nft_modal" className={`modal modal-bottom sm:modal-middle backdrop-blur-sm ${openModal ? 'modal-open' : ''}`}>
       <div className="modal-box bg-neutral-800 text-gray-100 rounded-2xl shadow-xl border border-neutral-700 p-6">
@@ -171,7 +165,7 @@ const NFTmint = ({ openModal, setModalState }: NFTMintProps) => {
           <AiOutlineCloudUpload className="text-3xl" />
           Mint a MasterPass NFT
         </h3>
-        
+
         <div className="space-y-4">
           <label className="block text-sm font-medium text-gray-400">
             Select an image to mint
@@ -199,8 +193,7 @@ const NFTmint = ({ openModal, setModalState }: NFTMintProps) => {
             />
           </div>
         </div>
-        
-        {/* Action buttons */}
+
         <div className="modal-action mt-6 flex flex-col-reverse sm:flex-row-reverse gap-3">
           <button
             type="button"

@@ -276,57 +276,98 @@ const Transact = ({ openModal, setModalState }: TransactInterface) => {
   }
 
   // ------------------------------
-  // Modal UI
+  // Modal UI — Professional, solid theme + subtle loading animations
   // ------------------------------
   return (
     <dialog
       id="transact_modal"
-      className={`modal modal-bottom sm:modal-middle backdrop-blur-sm ${openModal ? 'modal-open' : ''}`}
+      className={`modal modal-bottom sm:modal-middle ${openModal ? 'modal-open' : ''}`}
     >
-      <div className="modal-box bg-neutral-800 text-gray-100 rounded-2xl shadow-xl border border-neutral-700 p-6">
-        <h3 className="flex items-center gap-3 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-500 mb-6">
-          <AiOutlineSend className="text-3xl" />
+      <div
+        className={`
+          modal-box max-w-xl rounded-2xl border border-slate-200
+          bg-white text-slate-900 p-6 shadow-2xl
+          ${loading || groupLoading || optInLoading ? 'ring-1 ring-indigo-200' : ''}
+        `}
+      >
+        {/* Top loading bar */}
+        {(loading || groupLoading || optInLoading) && (
+          <div className="relative h-1 w-full mb-4 overflow-hidden rounded bg-slate-100">
+            <div className="absolute inset-y-0 left-0 w-1/3 animate-[loading_1.2s_ease-in-out_infinite] bg-indigo-600" />
+            <style>{`
+              @keyframes loading {
+                0%   { transform: translateX(-120%); }
+                50%  { transform: translateX(60%); }
+                100% { transform: translateX(220%); }
+              }
+            `}</style>
+          </div>
+        )}
+
+        <h3 className="flex items-center gap-3 text-xl sm:text-2xl font-semibold tracking-tight">
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50">
+            <AiOutlineSend className="text-xl text-indigo-600" />
+          </span>
           Send a Payment
         </h3>
+        <p className="mt-1 text-sm text-slate-500">
+          Use a connected wallet to send 1 {assetType} to a receiver. TestNet demo.
+        </p>
 
         {/* Receiver Address input (single send) */}
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text text-gray-400">Receiver's Address</span>
+        <div className={`form-control mt-5 ${loading ? 'animate-pulse' : ''}`}>
+          <label className="label py-1">
+            <span className="label-text text-slate-700 font-medium">Receiver&apos;s Address</span>
           </label>
           <input
             type="text"
             data-test-id="receiver-address"
-            className="input input-bordered w-full bg-neutral-700 text-gray-100 border-neutral-600 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+            className="
+              input input-bordered w-full rounded-xl
+              bg-white text-slate-900 placeholder:text-slate-400
+              border-slate-300 focus:outline-none
+              focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
+              transition
+            "
             placeholder="e.g., KPLX..."
             value={receiverAddress}
             onChange={(e) => setReceiverAddress(e.target.value)}
           />
           {/* Address length check for Algorand (58 chars) */}
           <div className="flex justify-between items-center text-xs mt-2">
-            <span className="text-gray-500">Amount: 1 {assetType}</span>
-            <span className={`font-mono ${receiverAddress.length === 58 ? 'text-green-400' : 'text-red-400'}`}>
+            <span className="text-slate-500">Amount: 1 {assetType}</span>
+            <span
+              className={`font-mono ${
+                receiverAddress.length === 58 ? 'text-emerald-600' : 'text-rose-600'
+              }`}
+            >
               {receiverAddress.length}/58
             </span>
           </div>
         </div>
 
         {/* Toggle ALGO ↔ USDC */}
-        <div className="flex justify-center gap-4 mt-4">
+        <div className="flex justify-center gap-3 mt-4">
           <button
             type="button"
-            className={`px-4 py-2 rounded-lg font-semibold transition ${
-              assetType === 'ALGO' ? 'bg-cyan-600 text-white' : 'bg-neutral-700 text-gray-300 hover:bg-neutral-600'
-            }`}
+            className={`
+              px-4 py-2 rounded-lg font-medium transition
+              border ${assetType === 'ALGO'
+                ? 'bg-indigo-600 border-indigo-600 text-white'
+                : 'bg-white border-slate-300 text-slate-700 hover:border-slate-400'}
+            `}
             onClick={() => setAssetType('ALGO')}
           >
             ALGO
           </button>
           <button
             type="button"
-            className={`px-4 py-2 rounded-lg font-semibold transition ${
-              assetType === 'USDC' ? 'bg-cyan-600 text-white' : 'bg-neutral-700 text-gray-300 hover:bg-neutral-600'
-            }`}
+            className={`
+              px-4 py-2 rounded-lg font-medium transition
+              border ${assetType === 'USDC'
+                ? 'bg-indigo-600 border-indigo-600 text-white'
+                : 'bg-white border-slate-300 text-slate-700 hover:border-slate-400'}
+            `}
             onClick={() => setAssetType('USDC')}
           >
             USDC
@@ -339,8 +380,11 @@ const Transact = ({ openModal, setModalState }: TransactInterface) => {
             data-test-id="send"
             type="button"
             className={`
-              btn w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white rounded-xl border-none font-semibold transition-all duration-300 transform active:scale-95
-              ${receiverAddress.length === 58 ? '' : 'btn-disabled bg-neutral-500 text-gray-200 cursor-not-allowed'}
+              btn w-full sm:w-auto rounded-xl font-semibold
+              transition-all duration-200
+              ${receiverAddress.length === 58
+                ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                : 'bg-slate-200 text-slate-500 cursor-not-allowed'}
             `}
             onClick={handleSubmit}
             disabled={loading || receiverAddress.length !== 58}
@@ -348,7 +392,7 @@ const Transact = ({ openModal, setModalState }: TransactInterface) => {
             {loading ? (
               <span className="flex items-center gap-2">
                 <AiOutlineLoading3Quarters className="animate-spin" />
-                Sending...
+                Sending…
               </span>
             ) : (
               `Send 1 ${assetType}`
@@ -356,7 +400,10 @@ const Transact = ({ openModal, setModalState }: TransactInterface) => {
           </button>
           <button
             type="button"
-            className="btn w-full sm:w-auto bg-neutral-700 hover:bg-neutral-600 border-none text-gray-300 rounded-xl"
+            className="
+              btn w-full sm:w-auto rounded-xl
+              bg-white hover:bg-slate-50 border border-slate-300 text-slate-700
+            "
             onClick={() => setModalState(false)}
           >
             Close
@@ -366,31 +413,32 @@ const Transact = ({ openModal, setModalState }: TransactInterface) => {
         {/* -------------------------------------------------
             Atomic Transfer (Separate Demo Section)
             ------------------------------------------------- */}
-        <div className="mt-8 p-4 rounded-xl border border-neutral-700 bg-neutral-900">
-          <h4 className="text-lg font-semibold mb-2">Atomic Transfer (2-in-1)</h4>
-          <p className="text-sm text-gray-400 mb-3">
-            Send <span className="font-semibold text-gray-200">1 ALGO</span> +{' '}
-            <span className="font-semibold text-gray-200">1 USDC</span> together in one atomic group.
+        <div className={`mt-8 p-4 rounded-xl border border-slate-200 bg-slate-50 ${groupLoading ? 'animate-pulse' : ''}`}>
+          <h4 className="text-base sm:text-lg font-semibold mb-1 text-slate-900">Atomic Transfer (2-in-1)</h4>
+          <p className="text-sm text-slate-600 mb-3">
+            Send <span className="font-semibold text-slate-900">1 ALGO</span> +{' '}
+            <span className="font-semibold text-slate-900">1 USDC</span> together in one atomic group.
             <br />
-            <span className="text-gray-500">Note: Receiver must be opted-in to USDC (ID: 10458941).</span>
+            <span className="text-slate-500">Note: Receiver must be opted-in to USDC (ID: 10458941).</span>
           </p>
 
           {/* Opt-in button for connected wallet */}
           <div className="flex flex-col sm:flex-row gap-3 mb-3">
             <button
               type="button"
-              className={`btn border-none rounded-xl w-full sm:w-auto ${
-                alreadyOpted
-                  ? 'bg-neutral-500 text-gray-200 cursor-not-allowed'
-                  : 'bg-green-500 hover:bg-green-600 text-white'
-              }`}
+              className={`
+                btn rounded-xl w-full sm:w-auto
+                ${alreadyOpted
+                  ? 'bg-slate-200 text-slate-500 cursor-not-allowed'
+                  : 'bg-emerald-600 hover:bg-emerald-700 text-white'}
+              `}
               onClick={handleOptInUSDC}
               disabled={optInLoading || !activeAddress || alreadyOpted}
             >
               {optInLoading ? (
                 <span className="flex items-center gap-2">
                   <AiOutlineLoading3Quarters className="animate-spin" />
-                  Opting in...
+                  Opting in…
                 </span>
               ) : alreadyOpted ? (
                 'Already Opted In'
@@ -402,21 +450,27 @@ const Transact = ({ openModal, setModalState }: TransactInterface) => {
 
           {/* Receiver input (for atomic group) */}
           <div className="form-control">
-            <label className="label">
-              <span className="label-text text-gray-400">Receiver's Address</span>
+            <label className="label py-1">
+              <span className="label-text text-slate-700 font-medium">Receiver&apos;s Address</span>
             </label>
             <input
               type="text"
-              className="input input-bordered w-full bg-neutral-700 text-gray-100 border-neutral-600 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="
+                input input-bordered w-full rounded-xl
+                bg-white text-slate-900 placeholder:text-slate-400
+                border-slate-300 focus:outline-none
+                focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
+                transition
+              "
               placeholder="e.g., KPLX..."
               value={groupReceiverAddress}
               onChange={(e) => setGroupReceiverAddress(e.target.value)}
             />
             <div className="flex justify-between items-center text-xs mt-2">
-              <span className="text-gray-500">Bundle: 1 ALGO + 1 USDC</span>
+              <span className="text-slate-500">Bundle: 1 ALGO + 1 USDC</span>
               <span
                 className={`font-mono ${
-                  groupReceiverAddress.length === 58 ? 'text-green-400' : 'text-red-400'
+                  groupReceiverAddress.length === 58 ? 'text-emerald-600' : 'text-rose-600'
                 }`}
               >
                 {groupReceiverAddress.length}/58
@@ -428,8 +482,10 @@ const Transact = ({ openModal, setModalState }: TransactInterface) => {
           <button
             type="button"
             className={`
-              mt-4 btn w-full sm:w-auto bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl border-none font-semibold transition-all duration-300 transform active:scale-95
-              ${groupReceiverAddress.length === 58 ? '' : 'btn-disabled bg-neutral-500 text-gray-200 cursor-not-allowed'}
+              mt-4 btn w-full sm:w-auto rounded-xl font-semibold
+              ${groupReceiverAddress.length === 58
+                ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                : 'bg-slate-200 text-slate-500 cursor-not-allowed'}
             `}
             onClick={handleAtomicGroup}
             disabled={groupLoading || groupReceiverAddress.length !== 58}
@@ -437,7 +493,7 @@ const Transact = ({ openModal, setModalState }: TransactInterface) => {
             {groupLoading ? (
               <span className="flex items-center gap-2">
                 <AiOutlineLoading3Quarters className="animate-spin" />
-                Sending Atomic...
+                Sending Atomic…
               </span>
             ) : (
               'Send Atomic: 1 ALGO + 1 USDC'

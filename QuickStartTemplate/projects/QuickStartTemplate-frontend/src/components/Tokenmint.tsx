@@ -109,113 +109,180 @@ const Tokenmint = ({ openModal, setModalState }: TokenMintProps) => {
   }
 
   // ------------------------------
-  // Modal UI
+  // Modal UI — Professional, clear, solid color theme + loading animations
   // ------------------------------
   return (
     <dialog
       id="token_modal"
-      className={`modal modal-bottom sm:modal-middle backdrop-blur-sm ${openModal ? 'modal-open' : ''}`}
+      className={`modal modal-bottom sm:modal-middle ${openModal ? 'modal-open' : ''}`}
     >
-      <div className="modal-box bg-neutral-800 text-gray-100 rounded-2xl shadow-xl border border-neutral-700 p-6">
-        <h3 className="flex items-center gap-3 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-500 mb-2">
-          <BsCoin className="text-3xl" />
-          Create a MasterPass Token
-        </h3>
-        <p className="text-gray-400 text-sm mb-6">
-          This creates a standard fungible token (ASA) on the Algorand TestNet.
-        </p>
-
-        {/* Input fields for customization */}
-        <div className="space-y-4">
-          {/* Asset Name */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text text-gray-400">Asset Name</span>
-            </label>
-            <input
-              type="text"
-              className="input input-bordered w-full bg-neutral-700 text-gray-100 border-neutral-600 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-              placeholder="e.g., MasterPass Token"
-              value={assetName}
-              onChange={(e) => setAssetName(e.target.value)}
-            />
+      <div
+        className={`
+          modal-box max-w-xl rounded-2xl border border-slate-200
+          bg-white text-slate-900 p-6 shadow-2xl
+        `}
+      >
+        {/* Top indeterminate loading bar */}
+        {loading && (
+          <div className="relative h-1 w-full -mt-2 mb-4 overflow-hidden rounded bg-slate-100">
+            <div className="absolute inset-y-0 left-0 w-1/3 animate-[loading_1.2s_ease-in-out_infinite] bg-indigo-600" />
+            <style>{`
+              @keyframes loading {
+                0%   { transform: translateX(-120%); }
+                50%  { transform: translateX(60%); }
+                100% { transform: translateX(220%); }
+              }
+            `}</style>
           </div>
+        )}
 
-          {/* Unit Name */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text text-gray-400">Unit Name</span>
-            </label>
-            <input
-              type="text"
-              className="input input-bordered w-full bg-neutral-700 text-gray-100 border-neutral-600 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-              placeholder="e.g., MPT"
-              value={unitName}
-              onChange={(e) => setUnitName(e.target.value)}
-            />
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50">
+              <BsCoin className="text-2xl text-indigo-600" />
+            </span>
+            <div>
+              <h3 className="text-xl sm:text-2xl font-semibold tracking-tight">Create a MasterPass Token</h3>
+              <p className="text-sm text-slate-500">Standard ASA creation on Algorand TestNet.</p>
+            </div>
           </div>
+          <button
+            type="button"
+            className="btn btn-sm rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-slate-700"
+            onClick={() => setModalState(false)}
+          >
+            Close
+          </button>
+        </div>
 
-          {/* Total Supply */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text text-gray-400">Total Supply</span>
-            </label>
-            <input
-              type="number"
-              min={1}
-              className="input input-bordered w-full bg-neutral-700 text-gray-100 border-neutral-600 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-              placeholder="e.g., 1000"
-              value={total}
-              onChange={(e) => setTotal(e.target.value)}
-            />
-          </div>
+        {/* Form */}
+        <div className={`mt-6 ${loading ? 'animate-pulse' : ''}`}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Asset Name */}
+            <div className="form-control">
+              <label className="label py-1">
+                <span className="label-text text-slate-700 font-medium">Token Name</span>
+              </label>
+              <input
+                type="text"
+                className="
+                  input input-bordered w-full rounded-xl
+                  bg-white text-slate-900 placeholder:text-slate-400
+                  border-slate-300 focus:outline-none
+                  focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
+                  transition
+                "
+                placeholder="e.g., MasterPass Token"
+                value={assetName}
+                onChange={(e) => setAssetName(e.target.value)}
+              />
+            </div>
 
-          {/* Decimals */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text text-gray-400">Decimals</span>
-            </label>
-            <input
-              type="number"
-              min={0}
-              max={19}
-              className="input input-bordered w-full bg-neutral-700 text-gray-100 border-neutral-600 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-              placeholder="0 for whole tokens"
-              value={decimals}
-              onChange={(e) => setDecimals(e.target.value)}
-            />
-            <div className="flex items-center gap-1 mt-2 text-xs text-gray-500">
-              <AiOutlineInfoCircle />
-              <p>On-chain total = <code>total × 10^decimals</code>.</p>
+            {/* Unit Name (Symbol) */}
+            <div className="form-control">
+              <label className="label py-1">
+                <span className="label-text text-slate-700 font-medium">Symbol</span>
+              </label>
+              <input
+                type="text"
+                className="
+                  input input-bordered w-full rounded-xl
+                  bg-white text-slate-900 placeholder:text-slate-400
+                  border-slate-300 focus:outline-none
+                  focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
+                  transition
+                "
+                placeholder="e.g., MPT"
+                value={unitName}
+                onChange={(e) => setUnitName(e.target.value)}
+              />
+            </div>
+
+            {/* Total Supply */}
+            <div className="form-control">
+              <label className="label py-1">
+                <span className="label-text text-slate-700 font-medium">Total Supply</span>
+              </label>
+              <input
+                type="number"
+                min={1}
+                className="
+                  input input-bordered w-full rounded-xl
+                  bg-white text-slate-900 placeholder:text-slate-400
+                  border-slate-300 focus:outline-none
+                  focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
+                  transition
+                "
+                placeholder="e.g., 1000"
+                value={total}
+                onChange={(e) => setTotal(e.target.value)}
+              />
+            </div>
+
+            {/* Decimals */}
+            <div className="form-control">
+              <label className="label py-1">
+                <span className="label-text text-slate-700 font-medium">Decimals</span>
+              </label>
+              <input
+                type="number"
+                min={0}
+                max={19}
+                className="
+                  input input-bordered w-full rounded-xl
+                  bg-white text-slate-900 placeholder:text-slate-400
+                  border-slate-300 focus:outline-none
+                  focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
+                  transition
+                "
+                placeholder="0 for whole tokens"
+                value={decimals}
+                onChange={(e) => setDecimals(e.target.value)}
+              />
+              <div className="flex items-center gap-2 mt-2 text-xs text-slate-500">
+                <AiOutlineInfoCircle />
+                <p>
+                  On-chain total = <code>total × 10^decimals</code>
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Action buttons */}
-        <div className="modal-action mt-6 flex flex-col-reverse sm:flex-row-reverse gap-3">
+        {/* Actions */}
+        <div className="mt-6 flex flex-col-reverse sm:flex-row-reverse gap-3">
           <button
             type="button"
-            className={`btn w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white rounded-xl border-none font-semibold ${
-              assetName && unitName && total ? '' : 'btn-disabled opacity-50 cursor-not-allowed'
-            }`}
+            className={`
+              btn w-full sm:w-auto rounded-xl font-semibold
+              transition-all duration-200
+              ${assetName && unitName && total
+                ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                : 'bg-slate-200 text-slate-500 cursor-not-allowed'}
+            `}
             onClick={handleMintToken}
             disabled={loading || !assetName || !unitName || !total}
           >
             {loading ? (
               <span className="flex items-center gap-2">
                 <AiOutlineLoading3Quarters className="animate-spin" />
-                Creating...
+                Creating…
               </span>
             ) : (
-              'Create Token'
+              'Mint Token'
             )}
           </button>
+
           <button
             type="button"
-            className="btn w-full sm:w-auto bg-neutral-700 hover:bg-neutral-600 border-none text-gray-300 rounded-xl"
+            className="
+              btn w-full sm:w-auto rounded-xl
+              bg-white hover:bg-slate-50 border border-slate-300 text-slate-700
+            "
             onClick={() => setModalState(false)}
           >
-            Close
+            Cancel
           </button>
         </div>
       </div>
