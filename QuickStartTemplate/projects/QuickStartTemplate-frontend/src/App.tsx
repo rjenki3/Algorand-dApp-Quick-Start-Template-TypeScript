@@ -2,6 +2,7 @@ import { SupportedWallet, WalletId, WalletManager, WalletProvider } from '@txnla
 import { SnackbarProvider } from 'notistack'
 import Home from './Home'
 import { getAlgodConfigFromViteEnvironment, getKmdConfigFromViteEnvironment } from './utils/network/getAlgoClientConfigs'
+import { Analytics } from '@vercel/analytics/react'
 
 let supportedWallets: SupportedWallet[]
 if (import.meta.env.VITE_ALGOD_NETWORK === 'localnet') {
@@ -50,6 +51,7 @@ export default function App() {
     <SnackbarProvider maxSnack={3}>
       <WalletProvider manager={walletManager}>
         <Home />
+        <Analytics />
       </WalletProvider>
     </SnackbarProvider>
   )
