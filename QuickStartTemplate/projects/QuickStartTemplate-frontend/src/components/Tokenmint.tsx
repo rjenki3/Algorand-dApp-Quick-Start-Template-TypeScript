@@ -16,13 +16,13 @@ interface TokenMintProps {
 }
 
 const Tokenmint = ({ openModal, setModalState }: TokenMintProps) => {
-  const LORA = 'https://lora.algokit.io/testnet';
+  const LORA = 'https://lora.algokit.io/testnet'
 
   // 👇 Default placeholder values (safe customization points for learners)
   const [assetName, setAssetName] = useState<string>('MasterPass Token') // token name
-  const [unitName, setUnitName] = useState<string>('MPT')               // short ticker
-  const [total, setTotal] = useState<string>('1000')                    // human-readable total
-  const [decimals, setDecimals] = useState<string>('0')                 // 0 = whole tokens only
+  const [unitName, setUnitName] = useState<string>('MPT') // short ticker
+  const [total, setTotal] = useState<string>('1000') // human-readable total
+  const [decimals, setDecimals] = useState<string>('0') // 0 = whole tokens only
 
   const [loading, setLoading] = useState<boolean>(false)
 
@@ -73,12 +73,12 @@ const Tokenmint = ({ openModal, setModalState }: TokenMintProps) => {
         signer: transactionSigner,
         total: onChainTotal,
         decimals: Number(decimalsBig),
-        assetName,   // <— customize token name
-        unitName,    // <— customize unit/ticker
+        assetName, // <— customize token name
+        unitName, // <— customize unit/ticker
         defaultFrozen: false,
       })
 
-      const id = createResult;
+      const id = createResult
 
       enqueueSnackbar(`✅ Success! Asset ID: ${id.assetId}`, {
         variant: 'success',
@@ -93,7 +93,7 @@ const Tokenmint = ({ openModal, setModalState }: TokenMintProps) => {
               View on Lora ↗
             </a>
           ) : null,
-      });
+      })
 
       // Reset back to defaults after successful mint
       setAssetName('MasterPass Token')
@@ -118,13 +118,13 @@ const Tokenmint = ({ openModal, setModalState }: TokenMintProps) => {
     >
       <div
         className={`
-          modal-box max-w-xl rounded-2xl border border-slate-200
-          bg-white text-slate-900 p-6 shadow-2xl
+          modal-box w-full max-w-2xl rounded-2xl border border-gray-200
+          bg-white text-slate-900 p-6 sm:p-7 shadow-2xl
         `}
       >
         {/* Top indeterminate loading bar */}
         {loading && (
-          <div className="relative h-1 w-full -mt-2 mb-4 overflow-hidden rounded bg-slate-100">
+          <div className="relative h-1 w-full -mt-2 mb-4 overflow-hidden rounded bg-gray-100">
             <div className="absolute inset-y-0 left-0 w-1/3 animate-[loading_1.2s_ease-in-out_infinite] bg-indigo-600" />
             <style>{`
               @keyframes loading {
@@ -137,19 +137,21 @@ const Tokenmint = ({ openModal, setModalState }: TokenMintProps) => {
         )}
 
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50">
               <BsCoin className="text-2xl text-indigo-600" />
             </span>
             <div>
-              <h3 className="text-xl sm:text-2xl font-semibold tracking-tight">Create a MasterPass Token</h3>
+              <h3 className="text-lg sm:text-xl font-semibold tracking-tight">
+                Create a MasterPass Token
+              </h3>
               <p className="text-sm text-slate-500">Standard ASA creation on Algorand TestNet.</p>
             </div>
           </div>
           <button
             type="button"
-            className="btn btn-sm rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-slate-700"
+            className="btn btn-sm rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-slate-700"
             onClick={() => setModalState(false)}
           >
             Close
@@ -157,8 +159,8 @@ const Tokenmint = ({ openModal, setModalState }: TokenMintProps) => {
         </div>
 
         {/* Form */}
-        <div className={`mt-6 ${loading ? 'animate-pulse' : ''}`}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className={`mt-6 ${loading ? 'opacity-90' : ''}`}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Asset Name */}
             <div className="form-control">
               <label className="label py-1">
@@ -169,9 +171,8 @@ const Tokenmint = ({ openModal, setModalState }: TokenMintProps) => {
                 className="
                   input input-bordered w-full rounded-xl
                   bg-white text-slate-900 placeholder:text-slate-400
-                  border-slate-300 focus:outline-none
-                  focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
-                  transition
+                  border-gray-200 focus:outline-none
+                  focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100
                 "
                 placeholder="e.g., MasterPass Token"
                 value={assetName}
@@ -189,9 +190,8 @@ const Tokenmint = ({ openModal, setModalState }: TokenMintProps) => {
                 className="
                   input input-bordered w-full rounded-xl
                   bg-white text-slate-900 placeholder:text-slate-400
-                  border-slate-300 focus:outline-none
-                  focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
-                  transition
+                  border-gray-200 focus:outline-none
+                  focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100
                 "
                 placeholder="e.g., MPT"
                 value={unitName}
@@ -210,9 +210,8 @@ const Tokenmint = ({ openModal, setModalState }: TokenMintProps) => {
                 className="
                   input input-bordered w-full rounded-xl
                   bg-white text-slate-900 placeholder:text-slate-400
-                  border-slate-300 focus:outline-none
-                  focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
-                  transition
+                  border-gray-200 focus:outline-none
+                  focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100
                 "
                 placeholder="e.g., 1000"
                 value={total}
@@ -232,9 +231,8 @@ const Tokenmint = ({ openModal, setModalState }: TokenMintProps) => {
                 className="
                   input input-bordered w-full rounded-xl
                   bg-white text-slate-900 placeholder:text-slate-400
-                  border-slate-300 focus:outline-none
-                  focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
-                  transition
+                  border-gray-200 focus:outline-none
+                  focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100
                 "
                 placeholder="0 for whole tokens"
                 value={decimals}
@@ -251,7 +249,7 @@ const Tokenmint = ({ openModal, setModalState }: TokenMintProps) => {
         </div>
 
         {/* Actions */}
-        <div className="mt-6 flex flex-col-reverse sm:flex-row-reverse gap-3">
+        <div className="mt-7 flex flex-col-reverse sm:flex-row-reverse gap-3">
           <button
             type="button"
             className={`
@@ -278,7 +276,7 @@ const Tokenmint = ({ openModal, setModalState }: TokenMintProps) => {
             type="button"
             className="
               btn w-full sm:w-auto rounded-xl
-              bg-white hover:bg-slate-50 border border-slate-300 text-slate-700
+              bg-white hover:bg-slate-50 border border-slate-200 text-slate-700
             "
             onClick={() => setModalState(false)}
           >
