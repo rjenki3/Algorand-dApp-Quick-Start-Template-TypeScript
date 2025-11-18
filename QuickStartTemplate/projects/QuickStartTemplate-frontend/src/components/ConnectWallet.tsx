@@ -1,8 +1,7 @@
 // ConnectWallet.tsx
 // Modal for selecting and connecting a wallet provider (Pera, Defly, KMD, etc).
 // Uses @txnlab/use-wallet-react to manage multiple wallet options.
-// 🔹 You don’t need to change logic in this file — it “just works”.
-// 🔹 Safe place to redesign the modal UI if you want a different look.
+// 🔹 UI-only redesign — logic, props, and handlers unchanged.
 
 import { useWallet, Wallet, WalletId } from '@txnlab/use-wallet-react'
 import { BsWallet2, BsCheckCircleFill } from 'react-icons/bs'
@@ -24,17 +23,34 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
       id="connect_wallet_modal"
       className={`modal modal-bottom sm:modal-middle backdrop-blur-sm ${openModal ? 'modal-open' : ''}`}
     >
-      <div className="modal-box bg-neutral-800 text-gray-100 rounded-2xl shadow-xl border border-neutral-700 p-6">
-        <h3 className="flex items-center gap-3 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-500 mb-6">
-          <BsWallet2 className="text-3xl" />
-          Select wallet provider
-        </h3>
+      <div className="modal-box max-w-lg bg-white text-gray-900 rounded-2xl shadow-2xl border border-gray-200 p-6 sm:p-7">
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="flex items-center gap-3 text-xl font-semibold text-gray-900">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+              <BsWallet2 className="text-lg" />
+            </span>
+            Select wallet provider
+          </h3>
+          <button
+            className="text-gray-400 hover:text-gray-600 transition text-sm"
+            onClick={closeModal}
+            aria-label="Close wallet modal"
+          >
+            ✕
+          </button>
+        </div>
+
+        <p className="text-sm text-gray-500 mb-4">
+          Choose the wallet you want to connect. Supported: Pera, Defly, LocalNet (KMD), and others.
+        </p>
 
         <div className="space-y-4">
           {activeAddress && (
             <>
-              <Account />
-              <div className="h-px bg-neutral-700 my-4" />
+              <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
+                <Account />
+              </div>
+              <div className="h-px bg-gray-200 my-2" />
             </>
           )}
 
@@ -43,9 +59,9 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
               <button
                 data-test-id={`${wallet.id}-connect`}
                 className={`
-                  w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-300 transform active:scale-95
-                  bg-neutral-700 hover:bg-neutral-600 border border-transparent
-                  focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-neutral-800
+                  w-full flex items-center gap-4 px-4 py-3 rounded-xl bg-white border border-gray-200
+                  hover:border-indigo-200 hover:bg-indigo-50/50 transition
+                  focus:outline-none focus:ring-2 focus:ring-indigo-200
                 `}
                 key={`provider-${wallet.id}`}
                 onClick={() => {
@@ -56,32 +72,33 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
                   <img
                     alt={`wallet_icon_${wallet.id}`}
                     src={wallet.metadata.icon}
-                    className="w-8 h-8 object-contain rounded-md"
+                    className="w-9 h-9 object-contain rounded-md border border-gray-100 bg-white"
                   />
                 )}
-                <span className="font-semibold text-lg flex-1 text-left">
+                <span className="font-medium text-sm text-left flex-1 text-gray-900">
                   {isKmd(wallet) ? 'LocalNet Wallet' : wallet.metadata.name}
                 </span>
                 {wallet.isActive && (
-                  <BsCheckCircleFill className="text-xl text-cyan-400" />
+                  <BsCheckCircleFill className="text-lg text-emerald-500" />
                 )}
               </button>
             ))}
         </div>
 
-        <div className="modal-action mt-6">
+        <div className="modal-action mt-6 flex gap-3">
           <button
             data-test-id="close-wallet-modal"
-            className="btn w-full sm:w-auto flex-1 bg-neutral-700 hover:bg-neutral-600 border-none text-gray-300 rounded-xl"
+            className="w-full sm:w-auto px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-700 text-sm hover:bg-gray-100 transition"
             onClick={() => {
               closeModal()
             }}
           >
             Close
           </button>
+
           {activeAddress && (
             <button
-              className="btn w-full sm:w-auto flex-1 bg-red-600 hover:bg-red-500 border-none text-white rounded-xl"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm transition"
               data-test-id="logout"
               onClick={async () => {
                 if (wallets) {
